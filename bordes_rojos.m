@@ -55,17 +55,28 @@ bordes_norte = magnitud1 .* mascara1;
 
 O = bordes_sur + bordes_norte;
 
-figure;
-% subplot(3,1,1)
-imshow(bordes_sur);
-title(['Bordes en ángulo de ', num2str(angulo_rojo), ' ± ', num2str(tolerancia), ' grados']);
-
-figure (2);
-% subplot(3,1,2)
-imshow(bordes_norte);
-title(['Bordes en ángulo de ', num2str(angulo_rojo), ' ± ', num2str(tolerancia), ' grados']);
+% figure;
+% % subplot(3,1,1)
+% imshow(bordes_sur);
+% title(['Bordes en ángulo de ', num2str(angulo_rojo), ' ± ', num2str(tolerancia), ' grados']);
+% 
+% figure (2);
+% % subplot(3,1,2)
+% imshow(bordes_norte);
+% title(['Bordes en ángulo de ', num2str(angulo_rojo), ' ± ', num2str(tolerancia), ' grados']);
 
 figure (3);
 % subplot(3,1,3)
 imshow(O);
+title('Imagen final');
+
+%BW = sauvola (O ,[50 50], 0.34);
+BW = imbinarize(O);
+
+paleta =uint8( [0 0 0;255 0 0] ); %negro // rojo
+
+figure (4);
+imshow(BW,paleta)
+% subplot(3,1,3)
+% imshow(BW);
 title('Imagen final');
