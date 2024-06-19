@@ -17,25 +17,53 @@ switch info.ColorType
         I = rgb2gray(Iorig); %convierto de RGB a escala de grises       
 end
 
+I = im2double(I);
 
-figure(1);imshow(Iorig)
+Hx=fspecial('sobel'); %S
+Hy=rot90(Hx); %E 
+Hx1=rot90(Hx,2);
+Hy1=rot90(Hx,3);
 
-im_red = double(Iorig(:,:,1));
-im_blue = double(Iorig(:,:,2));
-im_green = double(Iorig(:,:,3));
+% Gradiente en x e y usando filtro Sobel
+Gx = imfilter(double(I), Hx);
+Gy = imfilter(double(I), Hy);
 
-imar = im_red - im_blue - im_blue;
+% Gradiente en x e y usando filtro Sobel
+Gx1 = imfilter(double(I), Hx1);
+Gy1 = imfilter(double(I), Hy1);
 
-imabin = imar > 40;
-figure(2);imshow(imabin);
-% I = rgb2gray(imabin);
-% I=im2double(I); %convierto a clase double
-% 
-BW = edge(imabin, 'sobel');
+magnitude = sqrt(Gx.^2 + Gy.^2);
+angle = atan2d(Gy, Gx); % ángulo en grados
 
-figure(3)
-subplot(1,2,1)
-imshow(Iorig)
+magnitude1 = sqrt(Gx1.^2 + Gy1.^2);
+angle1 = atan2d(Gy1, Gx1); % ángulo en grados
 
-subplot(1,2,2)
-imshow(BW)
+target_angle = 4.5; % ejemplo: 45 grados
+tolerance = 2; % tolerancia de ±10 grados
+
+% Máscara para seleccionar bordes en el rango de ángulos
+mask = (angle >= target_angle - tolerance) & (angle <= target_angle + tolerance);
+
+% Máscara para seleccionar bordes en el rango de ángulos
+mask1 = (angle1 >= target_angle - tolerance) & (angle1 <= target_angle + tolerance);
+
+% Aplicar la máscara a la magnitud del gradiente
+selected_edges = magnitude .* mask;
+
+% Aplicar la máscara a la magnitud del gradiente
+selected_edges1 = magnitude1 .* mask1;
+
+O = selected_edges + selected_edges1;
+
+figure;
+subplot(3,1,1)
+imshow(selected_edges, []);
+title(['Bordes en ángulo de ', num2str(target_angle), ' ± ', num2str(tolerance), ' grados']);
+
+subplot(3,1,2)
+imshow(selected_edges1, []);
+title(['Bordes en ángulo de ', num2str(target_angle), ' ± ', num2str(tolerance), ' grados']);
+
+subplot(3,1,3)
+imshow(O, []);
+title(['Imagen final']);
