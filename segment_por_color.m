@@ -33,15 +33,15 @@ I = zeros(1000,1000,3); %creo inicialmente una imagen totalmente negra (x estar 
     rectangle('Position', [500, 750, 200,100],  'Curvature', [1,1], 'FaceColor', 'g', 'EdgeColor', 'g');
 
 % Generamos cuadrados azules 
-    rectangle('Position', [216, 54, 10, 20],    'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [80, 90, 28, 20],     'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [888, 300, 30, 20],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [730, 940, 50, 50],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [409, 450, 100, 100], 'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [650, 590, 45, 45],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [65, 500, 61, 60],    'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [801, 450, 42, 45],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
-    rectangle('Position', [250, 300, 35, 45],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', [0 0 1]);
+    rectangle('Position', [216, 54, 10, 20],    'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [80, 90, 28, 20],     'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [888, 300, 30, 20],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [730, 940, 50, 50],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [409, 450, 100, 100], 'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [650, 590, 45, 45],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [65, 500, 61, 60],    'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [801, 450, 42, 45],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
+    rectangle('Position', [250, 300, 35, 45],   'Curvature', [0 0], 'FaceColor', 'b', 'EdgeColor', 'b');
 
 % Generamos circulos negros
     rectangle('Position', [800, 800, 90, 90],   'Curvature', [1 1], 'FaceColor', 'k', 'EdgeColor', 'k');
