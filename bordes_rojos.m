@@ -39,7 +39,7 @@ magnitud1 = sqrt(Gx1.^2 + Gy1.^2);
 angulo1 = atan2d(Gy1, Gx1); % ángulo en grados
 
 angulo_rojo = 4.5; % ejemplo: 45 grados
-tolerancia = 2; % tolerancia de ±10 grados
+tolerancia = 1; % tolerancia de ±10 grados
 
 % Máscara para seleccionar bordes en el rango de ángulos
 mascara = (angulo >= angulo_rojo - tolerancia) & (angulo <= angulo_rojo + tolerancia);
