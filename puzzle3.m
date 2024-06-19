@@ -1,10 +1,10 @@
 clear all
 clc
 
-% Seleccionar la imagen mediante un diálogo de selección de archivos
-[filename, pathname] = uigetfile({'*.jpg;*.jpeg;*.png;*.bmp', 'Imágenes (*.jpg, *.jpeg, *.png, *.bmp)'}, 'Seleccione una imagen');
+% Seleccionar la imagen mediante un diÃ¡logo de selecciÃ³n de archivos
+[filename, pathname] = uigetfile({'*.jpg;*.jpeg;*.png;*.bmp', 'ImÃ¡genes (*.jpg, *.jpeg, *.png, *.bmp)'}, 'Seleccione una imagen');
 if isequal(filename, 0)
-    disp('No se seleccionó ninguna imagen.');
+    disp('No se seleccionÃ³ ninguna imagen.');
     return;
 end
 
@@ -17,166 +17,123 @@ imagenLAB = rgb2lab(imagenRGB);
 % Obtener las dimensiones de la imagen
 [alto, ancho, ~] = size(imagenLAB);
 
-% Calcular el tamaño de cada pieza
-alto_pieza = floor(alto / 4);
+% Calcular el tamaÃ±o de cada pieza
+alto_pieza = floor(alto / 4);  % Floor para evitar el warning
 ancho_pieza = floor(ancho / 4);
 
-% Inicializar las celdas para almacenar las piezas
-piezas = cell(4, 4);
+% Dividir la imagen en 16 piezas
+num_piezas = 4;
+piezas = cell(num_piezas, num_piezas);
 
-% Subdividir la imagen en 16 piezas
-for i = 1:4
-    for j = 1:4
+for i = 1:num_piezas
+    for j = 1:num_piezas
         fila_inicio = (i-1) * alto_pieza + 1;
+        columna_inicio = (j-1) * ancho_pieza + 1;
         fila_fin = i * alto_pieza;
-        col_inicio = (j-1) * ancho_pieza + 1;
-        col_fin = j * ancho_pieza;
-        
-        piezas{i, j} = imagenLAB(fila_inicio:fila_fin, col_inicio:col_fin, :);
+        columna_fin = j * ancho_pieza;
+        piezas{i, j} = imagenLAB(fila_inicio:fila_fin, columna_inicio:columna_fin, :);
     end
 end
 
-% Crear un arreglo de índices de las piezas y mezclarlo
-indices = randperm(16);
-piezas_mezcladas = cell(4, 4);
+% Mezclar las piezas sin cambiar la primera pieza
+indices_aleatorios = randperm(num_piezas^2 - 1) + 1; % Ãndices del 2 al 16
+indices_aleatorios = [1 indices_aleatorios]; % Mantener la primera pieza en su lugar
 
-% Reorganizar las piezas en el nuevo orden mezclado
-for i = 1:16
-    [fila, col] = ind2sub([4, 4], i);
-    [fila_mezclada, col_mezclada] = ind2sub([4, 4], indices(i));
-    piezas_mezcladas{fila_mezclada, col_mezclada} = piezas{fila, col};
-end
-
-% Crear la imagen desordenada
-imagen_desordenada = zeros(alto, ancho, 3);
-for i = 1:4
-    for j = 1:4
-        fila_inicio = (i-1) * alto_pieza + 1;
-        fila_fin = i * alto_pieza;
-        col_inicio = (j-1) * ancho_pieza + 1;
-        col_fin = j * ancho_pieza;
-        imagen_desordenada(fila_inicio:fila_fin, col_inicio:col_fin, :) = piezas_mezcladas{i, j};
+piezas_mezcladas = cell(size(piezas));
+index = 1;
+for i = 1:num_piezas
+    for j = 1:num_piezas
+        piezas_mezcladas{i, j} = piezas{ceil(indices_aleatorios(index) / num_piezas), mod(indices_aleatorios(index)-1, num_piezas) + 1};
+        index = index + 1;
     end
 end
 
-% Convertir la imagen desordenada de L*a*b* a RGB
-imagen_desordenada_rgb = lab2rgb(imagen_desordenada);
-
-% Inicializar la imagen reconstruida
-imagen_reconstruida = zeros(alto, ancho, 3);
-imagen_reconstruida(1:alto_pieza, 1:ancho_pieza, :) = piezas_mezcladas{1, 1};
-
-% Array para rastrear qué piezas han sido usadas
-usadas = false(4, 4);
-usadas(1, 1) = true;
-
-% Unir las piezas restantes en su posición correcta (búsqueda mejorada)
-for i = 1:4
-    for j = 1:4
-        if i == 1 && j == 1
-            continue;
-        end
-        
-        mejor_similitud = Inf;
-        mejor_pieza = [];
-        mejor_k = 0;
-        mejor_l = 0;
-        
-        for k = 1:4
-            for l = 1:4
-                if usadas(k, l)
-                    continue;
-                end
-                
-                % Verificar similitud con la pieza izquierda
-                if j > 1
-                    pieza_actual = imagen_reconstruida((i-1)*alto_pieza+1:i*alto_pieza, (j-2)*ancho_pieza+1:(j-1)*ancho_pieza, :);
-                    similitud = calcularSimilitud(pieza_actual, piezas_mezcladas{k, l}, 'horizontal');
-                    if similitud < mejor_similitud
-                        mejor_similitud = similitud;
-                        mejor_pieza = piezas_mezcladas{k, l};
-                        mejor_k = k;
-                        mejor_l = l;
-                    end
-                end
-                
-                % Verificar similitud con la pieza superior
-                if i > 1
-                    pieza_actual = imagen_reconstruida((i-2)*alto_pieza+1:(i-1)*alto_pieza, (j-1)*ancho_pieza+1:j*ancho_pieza, :);
-                    similitud = calcularSimilitud(pieza_actual, piezas_mezcladas{k, l}, 'vertical');
-                    if similitud < mejor_similitud
-                        mejor_similitud = similitud;
-                        mejor_pieza = piezas_mezcladas{k, l};
-                        mejor_k = k;
-                        mejor_l = l;
-                    end
-                end
-                
-                % Verificar similitud con la pieza derecha
-                if j < 4
-                    pieza_actual = imagen_reconstruida((i-1)*alto_pieza+1:i*alto_pieza, j*ancho_pieza+1:(j+1)*ancho_pieza, :);
-                    similitud = calcularSimilitud(pieza_actual, piezas_mezcladas{k, l}, 'horizontal');
-                    if similitud < mejor_similitud
-                        mejor_similitud = similitud;
-                        mejor_pieza = piezas_mezcladas{k, l};
-                        mejor_k = k;
-                        mejor_l = l;
-                    end
-                end
-                
-                % Verificar similitud con la pieza inferior
-                if i < 4
-                    pieza_actual = imagen_reconstruida(i*alto_pieza+1:(i+1)*alto_pieza, (j-1)*ancho_pieza+1:j*ancho_pieza, :);
-                    similitud = calcularSimilitud(pieza_actual, piezas_mezcladas{k, l}, 'vertical');
-                    if similitud < mejor_similitud
-                        mejor_similitud = similitud;
-                        mejor_pieza = piezas_mezcladas{k, l};
-                        mejor_k = k;
-                        mejor_l = l;
-                    end
-                end
-            end
-        end
-        
-        % Colocar la mejor pieza encontrada en la posición correcta
+% Crear la imagen mezclada
+imagen_mezclada = zeros(alto, ancho, 3, 'like', imagenLAB);
+for i = 1:num_piezas
+    for j = 1:num_piezas
         fila_inicio = (i-1) * alto_pieza + 1;
+        columna_inicio = (j-1) * ancho_pieza + 1;
         fila_fin = i * alto_pieza;
-        col_inicio = (j-1) * ancho_pieza + 1;
-        col_fin = j * ancho_pieza;
-
-        imagen_reconstruida(fila_inicio:fila_fin, col_inicio:col_fin, :) = mejor_pieza;
-        
-        % Marcar la pieza como usada
-        usadas(mejor_k, mejor_l) = true;
+        columna_fin = j * ancho_pieza;
+        imagen_mezclada(fila_inicio:fila_fin, columna_inicio:columna_fin, :) = piezas_mezcladas{i, j};
     end
 end
 
-% Convertir la imagen reconstruida de L*a*b* a RGB
-imagen_reconstruida_rgb = lab2rgb(imagen_reconstruida);
+% Ordenar las piezas
+piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_pieza, num_piezas);
 
-% Mostrar la imagen original, la imagen desordenada y la imagen reconstruida
+% Crear la imagen ordenada
+imagen_ordenada = zeros(alto, ancho, 3, 'like', imagenLAB);
+for i = 1:num_piezas
+    for j = 1:num_piezas
+        fila_inicio = (i-1) * alto_pieza + 1;
+        columna_inicio = (j-1) * ancho_pieza + 1;
+        fila_fin = i * alto_pieza;
+        columna_fin = j * ancho_pieza;
+        imagen_ordenada(fila_inicio:fila_fin, columna_inicio:columna_fin, :) = piezas_ordenadas{i, j};
+    end
+end
+
+% Mostrar las tres imÃ¡genes
 figure;
+
 subplot(1, 3, 1);
 imshow(imagenRGB);
 title('Imagen Original');
 
 subplot(1, 3, 2);
-imshow(imagen_desordenada_rgb);
-title('Imagen Desordenada');
+imshow(lab2rgb(imagen_mezclada));
+title('Imagen Mezclada');
 
 subplot(1, 3, 3);
-imshow(imagen_reconstruida_rgb);
-title('Imagen Reconstruida');
+imshow(lab2rgb(imagen_ordenada));
+title('Imagen Ordenada');
 
-% Función para calcular la similitud entre los bordes de dos piezas
-function similarity = calcularSimilitud(pieza1, pieza2, direccion)
-    if strcmp(direccion, 'horizontal')
-        borde1 = pieza1(:, end, :);
-        borde2 = pieza2(:, 1, :);
-    elseif strcmp(direccion, 'vertical')
-        borde1 = pieza1(end, :, :);
-        borde2 = pieza2(1, :, :);
+% FunciÃ³n para ordenar las piezas
+function piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_pieza, num_piezas)
+    % Inicializar la matriz de piezas ordenadas
+    piezas_ordenadas = cell(num_piezas, num_piezas);
+    piezas_ordenadas{1, 1} = piezas_mezcladas{1, 1}; % La primera pieza se mantiene en su lugar
+
+    % Algoritmo para ordenar las piezas
+    for i = 1:num_piezas
+        for j = 1:num_piezas
+            if i == 1 && j == 1
+                continue; % Saltar la primera pieza
+            end
+            
+            % Buscar la pieza que coincida con el borde de la pieza anterior
+            mejor_coincidencia = [];
+            minima_diferencia = inf;
+            for x = 1:num_piezas
+                for y = 1:num_piezas
+                    if isempty(piezas_mezcladas{x, y})
+                        continue;
+                    end
+
+                    if j > 1
+                        % Comparar con el borde derecho de la pieza izquierda
+                        borde_izquierdo = piezas_ordenadas{i, j-1}(:, end, :);
+                        borde_derecho = piezas_mezcladas{x, y}(:, 1, :);
+                        diferencia = sum(abs(borde_izquierdo(:) - borde_derecho(:)));
+                    elseif i > 1
+                        % Comparar con el borde inferior de la pieza superior
+                        borde_superior = piezas_ordenadas{i-1, j}(end, :, :);
+                        borde_inferior = piezas_mezcladas{x, y}(1, :, :);
+                        diferencia = sum(abs(borde_superior(:) - borde_inferior(:)));
+                    end
+
+                    if diferencia < minima_diferencia
+                        minima_diferencia = diferencia;
+                        mejor_coincidencia = {x, y};
+                    end
+                end
+            end
+
+            % Colocar la mejor coincidencia en la posiciÃ³n actual
+            piezas_ordenadas{i, j} = piezas_mezcladas{mejor_coincidencia{1}, mejor_coincidencia{2}};
+            piezas_mezcladas{mejor_coincidencia{1}, mejor_coincidencia{2}} = [];
+        end
     end
-    diferencia = borde1 - borde2;
-    similarity = sum(diferencia(:).^2);
 end
