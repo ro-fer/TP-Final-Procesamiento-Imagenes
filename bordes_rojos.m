@@ -29,8 +29,8 @@ Gx = imfilter(double(I), Hx);
 Gy = imfilter(double(I), Hy);
 
 % Gradiente en x e y usando filtro Sobel
-Gx1 = imfilter(double(I), Hx1);
-Gy1 = imfilter(double(I), Hy1);
+Gx1 = imfilter(I, Hx1);
+Gy1 = imfilter(I, Hy1);
 
 magnitud = sqrt(Gx.^2 + Gy.^2);
 angulo = atan2d(Gy, Gx); % ángulo en grados
