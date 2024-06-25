@@ -1,6 +1,9 @@
+% Ejercicio 1: Detección de bordes rojos. 
+
 close all; clear; clc
-% leo una imagen y la convierto a escala de grises
-[file,dir] = uigetfile('*.bmp;*.jpg;*.png; *.tif'); %filtro para archivos bmp, jpg y png
+
+% Lectura de imagen y conversión a escala de grises
+[file,dir] = uigetfile('*.bmp;*.jpg;*.png; *.tif'); 
 filename = [dir,file];
 info = imfinfo(filename);
 
@@ -8,10 +11,8 @@ switch info.ColorType
     case 'indexed'
         [Iorig,map] = imread(filename);
         I = ind2gray(Iorig,map); %convierto de indexada a escala de grises
-
     case 'grayscale'
         I = imread(filename);
-        
     case 'truecolor'
         Iorig = imread(filename);
         I = rgb2gray(Iorig); %convierto de RGB a escala de grises       
@@ -19,10 +20,10 @@ end
 
 I = im2double(I);
 
-Hx=fspecial('sobel'); %S
-Hy=rot90(Hx); %E 
-Hx1=rot90(Hx,2);
-Hy1=rot90(Hx,3);
+Hx  = fspecial('sobel'); 
+Hy  = rot90(Hx);  
+Hx1 = rot90(Hx,2);
+Hy1 = rot90(Hx,3);
 
 % Gradiente en x e y usando filtro Sobel
 Gx = imfilter(double(I), Hx);
@@ -33,10 +34,10 @@ Gx1 = imfilter(I, Hx1);
 Gy1 = imfilter(I, Hy1);
 
 magnitud = sqrt(Gx.^2 + Gy.^2);
-angulo = atan2d(Gy, Gx); % ángulo en grados
+angulo = atan2d(Gy, Gx); 
 
 magnitud1 = sqrt(Gx1.^2 + Gy1.^2);
-angulo1 = atan2d(Gy1, Gx1); % ángulo en grados
+angulo1 = atan2d(Gy1, Gx1); 
 
 angulo_rojo = 4.5; % ejemplo: 45 grados
 tolerancia = 1; % tolerancia de ±10 grados
