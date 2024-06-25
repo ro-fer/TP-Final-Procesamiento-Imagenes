@@ -1,6 +1,5 @@
 clear all; clc; close all;
 
-% Seleccionar la imagen mediante un diálogo de selección de archivos
 [filename, pathname] = uigetfile({'*.jpg;*.jpeg;*.png;*.bmp', 'Imágenes (*.jpg, *.jpeg, *.png, *.bmp)'}, 'Seleccione una imagen');
 if isequal(filename, 0)
     disp('No se seleccionó ninguna imagen.');
@@ -11,11 +10,9 @@ imagenRGB = imread(fullfile(pathname, filename));
 imagenLAB = rgb2lab(imagenRGB);
 [alto, ancho, ~] = size(imagenLAB);
 
-% Calcular el tamaño de cada pieza
 alto_pieza = floor(alto / 4);  % Floor para evitar el warning
 ancho_pieza = floor(ancho / 4);
 
-% Dividir la imagen en 16 piezas
 num_piezas = 4;
 piezas = cell(num_piezas, num_piezas);
 
@@ -29,7 +26,6 @@ for i = 1:num_piezas
     end
 end
 
-% Mezclar las piezas sin cambiar la primera pieza
 indices_aleatorios = randperm(num_piezas^2 - 1) + 1;
 indices_aleatorios = [1 indices_aleatorios]; 
 
@@ -42,7 +38,6 @@ for i = 1:num_piezas
     end
 end
 
-% Creación de la imagen mezclada
 imagen_mezclada = zeros(alto, ancho, 3, 'like', imagenLAB);
 for i = 1:num_piezas
     for j = 1:num_piezas
@@ -54,7 +49,6 @@ for i = 1:num_piezas
     end
 end
 
-% Orden de las piezas y creación de imagen ordenada
 piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_pieza, num_piezas);
 imagen_ordenada = zeros(alto, ancho, 3, 'like', imagenLAB);
 for i = 1:num_piezas
@@ -72,20 +66,17 @@ subplot(1, 3, 1); imshow(imagenRGB); title('Imagen Original');
 subplot(1, 3, 2);imshow(lab2rgb(imagen_mezclada)); title('Imagen Mezclada');
 subplot(1, 3, 3); imshow(lab2rgb(imagen_ordenada)); title('Imagen Ordenada');
 
-% Función para ordenar las piezas
 function piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_pieza, num_piezas)
     % Inicializar la matriz de piezas ordenadas
     piezas_ordenadas = cell(num_piezas, num_piezas);
     piezas_ordenadas{1, 1} = piezas_mezcladas{1, 1}; % La primera pieza se mantiene en su lugar
 
-    % Algoritmo para ordenar las piezas
     for i = 1:num_piezas
         for j = 1:num_piezas
             if i == 1 && j == 1
                 continue; % Saltar la primera pieza
             end
             
-            % Buscar la pieza que coincida con el borde de la pieza anterior
             mejor_coincidencia = [];
             minima_diferencia = inf;
             for x = 1:num_piezas
@@ -113,7 +104,6 @@ function piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_p
                 end
             end
 
-            % Colocar la mejor coincidencia en la posición actual
             piezas_ordenadas{i, j} = piezas_mezcladas{mejor_coincidencia{1}, mejor_coincidencia{2}};
             piezas_mezcladas{mejor_coincidencia{1}, mejor_coincidencia{2}} = [];
         end
