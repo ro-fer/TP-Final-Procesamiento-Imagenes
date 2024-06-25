@@ -1,28 +1,21 @@
-%Ejercicio 4
+% Ejercicio 4: Segmentación por color
 
 clc; close all;
 
 %Generamos una imagen RGB de 1000x1000
+
 iptsetpref('ImshowBorder','tight');
-I = zeros(1000,1000,3); %creo inicialmente una imagen totalmente negra (x estar llena de ceros)
-    I = double(I); %la convierto en double para posteriormente poder manipularla 
+I = zeros(1000,1000,3); 
+I = double(I);  
    
-   % Le doy los valores necesarios para que el fondo tome el color amarillo
-   % En Rgb el color amarillo tiene el código 110
+% Le doy los valores necesarios para que el fondo tome el color amarillo (110)
   
-    I(:,:,1)=1;
-    I(:,:,2)=1;
-    I(:,:,3)=0;
-    
-    imshow(I);
+I(:,:,1)=1;
+I(:,:,2)=1;
+I(:,:,3)=0;
+imshow(I);
 
 %% Generación de objetos
-  %Agregamos las figuras correspondientes con 'rectangle' 
-    %selecciona espacio en el recuadro, y segun los valores brindados a sus
-        %caracteristicas genera figuras. 
-    %Curvature redondea los bordes si le pongo 1, sino lo deja cuadrado.
-        %acepta valores entre 0 y 1
-    % Face color y edge color: selecciona color de relleno y bordes
 
 % Generamos circulos verdes 
     rectangle('Position', [42, 100, 64, 410],   'Curvature', [1 1], 'FaceColor', 'g', 'EdgeColor', 'g');
@@ -61,36 +54,29 @@ I = zeros(1000,1000,3); %creo inicialmente una imagen totalmente negra (x estar 
     rectangle('Position', [900, 900, 100, 45],  'Curvature', [1 1], 'FaceColor', 'r', 'EdgeColor', 'r');
   
 %% Guardado y apertura de imagen
-
-% Se guarda la imagen con el nombre de "FORMAS"
 saveas(gcf,'FORMAS.png')
-   
-% Luego de guargar la imagen procedemos a trabajar con ella 
 I = imread('FORMAS.png');
-delete('FORMAS.png');   % luego de usarla la elimino
-iptsetpref('ImshowBorder','loose'); % le pongo margenes para que se vea mas clara
-Imagen_Lab= rgb2lab(I); % convierto de RGB a imagen tipo LAB
+delete('FORMAS.png');   
+iptsetpref('ImshowBorder','loose'); 
+Imagen_Lab= rgb2lab(I);
   
 
 %% Separación cada uno de los espacios de color 
     
-    L_valores = Imagen_Lab(:,:,1);
-    A_valores = Imagen_Lab(:,:,2);
-    B_valores = Imagen_Lab(:,:,3);
+L_valores = Imagen_Lab(:,:,1);
+A_valores = Imagen_Lab(:,:,2);
+B_valores = Imagen_Lab(:,:,3);
     
-% Definimos colores segun LAB
+% Definición colores segun LAB
 rojo     = (A_valores >= 60 & B_valores >= 0);
 verde    = (A_valores <= -60);
 negro    = (L_valores <= 30 & A_valores >= -5 & A_valores <= 5 & B_valores >= -5 & B_valores <= 5); 
-%negro    = (A_valores == 0 & B_valores == 0);
 amarillo = (B_valores >= 60);
 azul     = (B_valores <= -60);
 
 
 %% Conteo de objetos del mismo color
-% bwlabel hace el conteo de cada uno de los objetos por color. Le tengo que pasar la
-% caracteristica que quiero contar 
-    % n_color cuenta cuantos elementos de ese color hay
+
 [L_rojo, n_rojo]   = bwlabel(rojo);
 [L_verde, n_verde] = bwlabel(verde);
 [L_negro, n_negro] = bwlabel(negro);
@@ -104,13 +90,8 @@ imagen_verde = uint8(255 * ones(size(I)));
 imagen_negro = uint8(255 * ones(size(I)));
 imagen_azul  = uint8(255 * ones(size(I)));
 
-% Rellenamos las imágenes con los objetos de cada color
-    % repmat replica matrices: se construye imagen 'imagen_color' donde
-    % solo los px que corresponden a dicho color de la imagen original se
-    % mantienen, el resto va en blanco (xq 'imagen_color' es una matriz de
-    % unos, es decir, todo blanco).
-    
-    % Se le pasa [1, 1, 3] replica en 3D, es decir, hace una mascara
+% Máscara y relleno de las imágenes con los objetos de cada color
+
 imagen_rojo(repmat(rojo, [1, 1, 3]))   = I(repmat(rojo, [1, 1, 3]));
 imagen_verde(repmat(verde, [1, 1, 3])) = I(repmat(verde, [1, 1, 3]));
 imagen_negro(repmat(negro, [1, 1, 3])) = I(repmat(negro, [1, 1, 3]));
