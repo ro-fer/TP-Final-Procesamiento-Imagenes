@@ -86,12 +86,12 @@ function piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_p
                     end
 
                     if j > 1
-                        % Comparar con el borde derecho de la pieza izquierda
+                       
                         borde_izquierdo = piezas_ordenadas{i, j-1}(:, end, :);
                         borde_derecho = piezas_mezcladas{x, y}(:, 1, :);
                         diferencia = sum(abs(borde_izquierdo(:) - borde_derecho(:)));
                     elseif i > 1
-                        % Comparar con el borde inferior de la pieza superior
+                        
                         borde_superior = piezas_ordenadas{i-1, j}(end, :, :);
                         borde_inferior = piezas_mezcladas{x, y}(1, :, :);
                         diferencia = sum(abs(borde_superior(:) - borde_inferior(:)));
