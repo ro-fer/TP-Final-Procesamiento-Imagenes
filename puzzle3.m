@@ -1,5 +1,4 @@
-clear all
-clc
+clear all; clc; close all;
 
 % Seleccionar la imagen mediante un diálogo de selección de archivos
 [filename, pathname] = uigetfile({'*.jpg;*.jpeg;*.png;*.bmp', 'Imágenes (*.jpg, *.jpeg, *.png, *.bmp)'}, 'Seleccione una imagen');
@@ -8,13 +7,8 @@ if isequal(filename, 0)
     return;
 end
 
-% Leer la imagen seleccionada
 imagenRGB = imread(fullfile(pathname, filename));
-
-% Convertir la imagen de RGB a L*a*b*
 imagenLAB = rgb2lab(imagenRGB);
-
-% Obtener las dimensiones de la imagen
 [alto, ancho, ~] = size(imagenLAB);
 
 % Calcular el tamaño de cada pieza
@@ -36,8 +30,8 @@ for i = 1:num_piezas
 end
 
 % Mezclar las piezas sin cambiar la primera pieza
-indices_aleatorios = randperm(num_piezas^2 - 1) + 1; % Índices del 2 al 16
-indices_aleatorios = [1 indices_aleatorios]; % Mantener la primera pieza en su lugar
+indices_aleatorios = randperm(num_piezas^2 - 1) + 1;
+indices_aleatorios = [1 indices_aleatorios]; 
 
 piezas_mezcladas = cell(size(piezas));
 index = 1;
@@ -48,7 +42,7 @@ for i = 1:num_piezas
     end
 end
 
-% Crear la imagen mezclada
+% Creación de la imagen mezclada
 imagen_mezclada = zeros(alto, ancho, 3, 'like', imagenLAB);
 for i = 1:num_piezas
     for j = 1:num_piezas
@@ -60,10 +54,8 @@ for i = 1:num_piezas
     end
 end
 
-% Ordenar las piezas
+% Orden de las piezas y creación de imagen ordenada
 piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_pieza, num_piezas);
-
-% Crear la imagen ordenada
 imagen_ordenada = zeros(alto, ancho, 3, 'like', imagenLAB);
 for i = 1:num_piezas
     for j = 1:num_piezas
@@ -75,20 +67,10 @@ for i = 1:num_piezas
     end
 end
 
-% Mostrar las tres imágenes
 figure;
-
-subplot(1, 3, 1);
-imshow(imagenRGB);
-title('Imagen Original');
-
-subplot(1, 3, 2);
-imshow(lab2rgb(imagen_mezclada));
-title('Imagen Mezclada');
-
-subplot(1, 3, 3);
-imshow(lab2rgb(imagen_ordenada));
-title('Imagen Ordenada');
+subplot(1, 3, 1); imshow(imagenRGB); title('Imagen Original');
+subplot(1, 3, 2);imshow(lab2rgb(imagen_mezclada)); title('Imagen Mezclada');
+subplot(1, 3, 3); imshow(lab2rgb(imagen_ordenada)); title('Imagen Ordenada');
 
 % Función para ordenar las piezas
 function piezas_ordenadas = ordenar_piezas(piezas_mezcladas, alto_pieza, ancho_pieza, num_piezas)
